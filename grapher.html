@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Graphing HTML Test</title>
+</head>
+<body style="font-family: arial;">
+  <h1 style="text-align: center;">Cannon's Graphing Utility!</h1>
+  <div style="background-color:#dddddd; float: left;">
+    <p>Input the constants for a cubic equation <br>to graph it as a function of x.</p>
+    <p><b>f(x) = ax^3 + bx^2 + cx + d</b></p>
+    a:<input type ="text" value="1.0" id="a"></input> <br>
+    b:<input type ="text" value="3.0" id="b"></input> <br>
+    c:<input type ="text" value="1.0" id="c"></input> <br>
+    d:<input type ="text" value="0.0" id="d"></input> <br> <br>
+    Scale of X axis: <input type="text" value="50.0" id="scalex"></input>Pixels per unit <br>
+    Scale of Y axis: <input type="text" value="50.0" id="scaley"></input>Pixels per unit <br><br>
+    Thickness of lines: <input type="text" value="3.0" id="dotsize"></input>Pixels<br><br>
+    Show derivative of f(x): <input type="checkbox" id ="der" value="false"></input><br>
+    Show second derivative of f(x): <input type="checkbox" id ="der2" value="false"></input><br><br>
+    <button onclick="draw()">Graph!</button> <br><br>
+
+    <div style="float: left; background-color: #999999;">
+      <br>
+      Canvas Width: <input type="text" id = "canwidth" value = "400"></input><br>
+      Canvas Height: <input type="text" id = "canheight" value = "400"></input> <br>
+      <button type="button" onclick="resize()">Resize Canvas</button> <br>
+    </div>
+  </div>
+
+
+<canvas width="400px" height="400px" id="can"style="background-color:#eeeeee; float: right;">This is a canvas</canvas>
+
+  <script type="text/javascript">
+
+  var resize = function() {
+    width = document.getElementById("canwidth").value;
+    height = document.getElementById("canheight").value;
+
+    if(width > 1 && height > 1){
+      document.getElementById("can").width = parseInt(width);
+      document.getElementById("can").height = parseInt(height);
+      draw();
+    } else {
+      alert("Please make width and heigth greater than 1.")
+    }
+  }
+
+    var draw = function() {
+
+      canvasx = document.getElementById("can").width;
+      canvasy = document.getElementById("can").height;
+
+      var wordscale = canvasx/15
+
+      var der = document.getElementById("der").checked;
+      var der2 = document.getElementById("der2").checked;
+
+      var canvas = document.getElementById("can");
+      var ctx=canvas.getContext('2d');
+
+      var dotsize = document.getElementById("dotsize").value;
+
+      xscale = parseInt(document.getElementById("scalex").value);
+      yscale = parseInt(document.getElementById("scaley").value);
+
+      if(xscale <= 0 || yscale <= 0){
+        alert("Please change the scales to numbers greater than or equal to 1.")
+      } else {
+        var x = 0.0;
+        var y = 0.0;
+
+        var a =1.0 * document.getElementById("a").value;
+        var b =1.0 * document.getElementById("b").value;
+        var c =1.0 * document.getElementById("c").value;
+        var d =1.0 * document.getElementById("d").value;
+
+        ctx.clearRect(0,0,canvasx, canvasy);
+
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(0, canvasy/2, canvasx, 1);
+        ctx.fillRect(canvasx/2,0, 1, canvasy);
+
+        //alert(xscale);
+        for(var g = 0; g < canvasx; g += parseInt(xscale)){
+          ctx.fillRect(g, canvasy/2 - 3, 1, 6);
+        }
+        for(var g = 0; g < canvasy; g += parseInt(yscale)){
+          ctx.fillRect((canvasx/2) - 3, g, 6, 1);
+        }
+        ctx.font = wordscale/4 + "px Arial";
+        var count = 0;
+        for(count = 0; count < 6; count += 1){
+        ctx.fillText(count, canvasx/2 + count * xscale, canvasy/2 + 10);
+        }
+
+        var count = 0;
+        for(count = 0; count < 6; count += 1){
+        ctx.fillText(count, canvasx/2 + 7,canvasy/2 + count * yscale * -1 + 5);
+        }
+        //alert(a)
+
+        ctx.font = wordscale/2 + "px Arial";
+        ctx.fillText("x",canvasx - 20, canvasy/2 - 10);
+        ctx.fillText("f(x)",canvasx/2 + 10, 30);
+
+        ctx.fillStyle = "#ff0000";
+        for(x = -300; x < 300; x += 0.001){
+          //alert(x + "  " + y);
+          //absolute values of
+          y = (a * (x * x * x) ) + (b * (x * x) ) + c * (x) + d;
+
+          ctx.fillRect((canvasx/2) + ( (xscale * x) - dotsize/2 ),  (canvasy/2) +  ( (yscale * (-1 * y )) - dotsize/2), dotsize, dotsize);
+          //alert("at end");
+        }
+        ctx.font = wordscale/2 + "px Arial";
+        ctx.fillText("f(x) = " + a + "x^3 + " + b + "x^2 + "+ c +"x + " + d,10, wordscale);
+
+
+        if(der === true){
+          ctx.fillStyle = "#0000ff";
+          for(x= -300; x < 300; x += 0.001){
+            y = (3 * a * (x * x)) + (2 * b * x) + c;
+            ctx.fillRect((canvasx/2) + ( (xscale * x) - dotsize/2 ),  (canvasy/2) +  ( (yscale * (-1 * y )) - dotsize/2), dotsize, dotsize);
+          }
+          ctx.font = wordscale/2 + "px Arial";
+          ctx.fillText("f '(x) = " + 3 * a + "x^2 + " + 2 * b + "x + " + c,10, wordscale * 2);
+        }
+
+        if (der2 === true) {
+          ctx.fillStyle = "#00ff00";
+          for(x= -300; x < 300; x += 0.001){
+            y = (3 * 2 *a * x) + (2 * b );
+            ctx.fillRect((canvasx/2) + ( (xscale * x) - dotsize/2 ),  (canvasy/2) +  ( (yscale * (-1 * y )) - dotsize/2), dotsize, dotsize);
+          }
+          ctx.font = wordscale/2 + "px Arial";
+          ctx.fillText("f ''(x) = " + 3 * 2 * a + "x + " + 2 * b,10, wordscale * 3);
+        }
+      }
+    }
+
+    draw();
+
+  </script>
+</body>
+</html>
